@@ -18,6 +18,9 @@ int	mlx_loop_end(void *mlx_ptr)
 
 	mlx = (t_mlx *)mlx_ptr;
 	mlx->is_loop_end = 1;
+#ifdef __EMSCRIPTEN__
+	emscripten_cancel_main_loop();
+#endif
 	return (0);
 }
 
@@ -50,30 +53,48 @@ static void	dispatch_events(t_mlx *mlx)
 	}
 }
 
+static int	_mlx_loop_frame(t_mlx *mlx)
+{
+	t_window	*current_window;
+
+	if (mlx->is_loop_end || !mlx->win_list)
+		return (1);
+	if (mlx->loop_hook && mlx->loop_hook(mlx->loop_param) != 0)
+		mlx->is_loop_end = 1;
+	current_window = mlx->win_list;
+	while (current_window)
+	{
+		glfwMakeContextCurrent(current_window->glfw_window);
+		current_window = current_window->next;
+	}
+	if (mlx->is_loop_end || !mlx->win_list)
+		return (1);
+	glfwPollEvents();
+	return (0);
+}
+
+#ifdef __EMSCRIPTEN__
+static void	_mlx_loop_iteration(void *param)
+{
+	if (_mlx_loop_frame((t_mlx *)param))
+		emscripten_cancel_main_loop();
+}
+#endif
+
 int	mlx_loop(void *mlx_ptr)
 {
-	t_mlx		*mlx;
-	t_window	*current_window;
+	t_mlx	*mlx;
 
 	mlx = (t_mlx *)mlx_ptr;
 	if (!mlx || !mlx->win_list)
 		return (1);
 	dispatch_events(mlx);
-	while (!mlx->is_loop_end && mlx->win_list)
-	{
-		if (mlx->loop_hook && mlx->loop_hook(mlx->loop_param) != 0)
-			mlx->is_loop_end = 1;
-		current_window = mlx->win_list;
-		while (current_window)
-		{
-			glfwMakeContextCurrent(current_window->glfw_window);
-			current_window = current_window->next;
-		}
-		if (mlx->is_loop_end)
-			break ;
-		if (!mlx->win_list)
-			mlx->is_loop_end = 1;
-		glfwPollEvents();
-	}
+#ifdef __EMSCRIPTEN__
+	emscripten_set_main_loop_arg(_mlx_loop_iteration, mlx, 0, 1);
 	return (0);
+#else
+	while (!_mlx_loop_frame(mlx))
+		;
+	return (0);
+#endif
 }

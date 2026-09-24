@@ -15,10 +15,14 @@
 
 static void	initialize_hints(void)
 {
+#ifndef __EMSCRIPTEN__
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+#endif
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+#ifndef __EMSCRIPTEN__
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
 	glfwWindowHint(GLFW_SAMPLES, 8);
 	glfwWindowHint(GLFW_ALPHA_BITS, 8);
 	glfwWindowHint(GLFW_DEPTH_BITS, 24);
@@ -62,6 +66,7 @@ void	*mlx_new_window(void *mlx_ptr, int width, int height, char *title)
 		return (NULL);
 	}
 	glfwMakeContextCurrent(win->glfw_window);
+#ifndef __EMSCRIPTEN__
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		glfwDestroyWindow(win->glfw_window);
@@ -69,6 +74,7 @@ void	*mlx_new_window(void *mlx_ptr, int width, int height, char *title)
 		free(win);
 		return (NULL);
 	}
+#endif
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	memset(win->hooks, 0, sizeof(win->hooks));

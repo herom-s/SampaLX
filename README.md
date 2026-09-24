@@ -19,6 +19,7 @@ MiniLibX is historically tied to the X11 window system. SampaLX replaces that ba
 | `libglfw3` | Window creation, OpenGL context, input handling |
 | `libGL`    | OpenGL implementation |
 | `make` + `cc` | Build system and C compiler |
+| `emscripten` (optional) | WebGL / WebAssembly builds (`make web`) |
 
 On Debian/Ubuntu-based systems:
 
@@ -74,6 +75,40 @@ cd test
 make
 ./program
 ```
+
+## Web / WebGL build
+
+SampaLX can be compiled to WebAssembly and rendered through **WebGL 2** with Emscripten, so MiniLibX programs run in the browser.
+
+Install Emscripten (on Arch/CachyOS: `sudo pacman -S emscripten`; elsewhere use `emsdk`), then:
+
+```sh
+make web                 # builds libmlx_web.a
+cd test && make web      # builds program.html (+ program.js, program.wasm)
+```
+
+The page must be served over HTTP (`file://` blocks the wasm fetch):
+
+```sh
+cd test && python3 -m http.server 8000
+# then open http://localhost:8000/program.html
+```
+
+Link your own project the same way:
+
+```sh
+emcc your_project.c -L. -lmlx_web -sUSE_GLFW=3 -sMIN_WEBGL_VERSION=2 \
+  -sMAX_WEBGL_VERSION=2 -sALLOW_MEMORY_GROWTH=1 -o game.html
+```
+
+### WebGL notes
+
+- Requires **WebGL 2** (OpenGL ES 3.0); shaders switch to `#version 300 es` automatically.
+- Only a single window is supported by the Emscripten GLFW backend.
+- `mlx_loop` is driven by `requestAnimationFrame`; after `mlx_loop_end` the last frame stays frozen on the canvas (code after `mlx_loop` does not run on the web).
+- Keyboard events require the canvas to have focus (click it once).
+- Blocking calls such as `usleep` inside hooks are not supported without `-sASYNCIFY`.
+- `mlx_mouse_hide`/`mlx_mouse_show` toggle the CSS cursor; `mlx_get_screen_size` reports the browser screen size.
 
 ## Project structure
 

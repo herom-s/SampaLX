@@ -15,9 +15,12 @@
 
 # include "mlx.h"
 # include "mlx_font.h"
-# include "../glad/include/glad/glad.h"
+# include "mlx_gl.h"
 # include "mlx_int_hooks.h"
 # include <GLFW/glfw3.h>
+# ifdef __EMSCRIPTEN__
+#  include <emscripten.h>
+# endif
 # include <stdlib.h>
 # include <stdio.h>
 # include <string.h>
@@ -85,5 +88,9 @@ int				_glfw_to_mlx_keycode(int glfw_keycode);
 int				_glfw_mouse_to_mlx(int glfw_keycode);
 void			_set_pos_and_size_of_texture(t_window *window, t_img *img,
 											int x, int y);
+
+# ifdef __EMSCRIPTEN__
+void			_mlx_web_set_cursor(int hidden);
+# endif
 
 #endif

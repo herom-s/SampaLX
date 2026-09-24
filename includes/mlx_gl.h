@@ -1,30 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   mlx_mouse_show.c                                   :+:      :+:    :+:   */
+/*   mlx_gl.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fbenini- <your@mail.com>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/14 15:25:33 by fbenini-          #+#    #+#             */
-/*   Updated: 2025/10/14 15:25:40 by fbenini-         ###   ########.fr       */
+/*   Created: 2026/09/24 00:00:00 by fbenini-          #+#    #+#             */
+/*   Updated: 2026/09/24 00:00:00 by fbenini-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/mlx_int.h"
-#include <GLFW/glfw3.h>
+#ifndef MLX_GL_H
+# define MLX_GL_H
 
-int	mlx_mouse_show(void *mlx_ptr, void *win_ptr)
-{
-	t_window	*win;
-
-	win = (t_window *)win_ptr;
-	(void)mlx_ptr;
-	if (!win || !win->glfw_window)
-		return (1);
 #ifdef __EMSCRIPTEN__
-	_mlx_web_set_cursor(0);
+# ifndef GLFW_INCLUDE_NONE
+#  define GLFW_INCLUDE_NONE
+# endif
+# include <GLES3/gl3.h>
 #else
-	glfwSetInputMode(win->glfw_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+# include "../glad/include/glad/glad.h"
 #endif
-	return (0);
-}
+
+#endif

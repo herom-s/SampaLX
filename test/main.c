@@ -33,7 +33,12 @@ typedef struct s_state
 int	mouse_move(int x, int y, void *param)
 {
 	(void)param;
+#ifndef __EMSCRIPTEN__
 	printf("%d %d\n", x, y);
+#else
+	(void)x;
+	(void)y;
+#endif
 	return (0);
 }
 
@@ -88,7 +93,9 @@ int	loop_hook(void *param)
 		mlx_string_put(s->mlx, s->win, 370, 20 + (40 * i), 0xFF0000, "Heyyyyy");
 	}
 	mlx_put_image_to_window(s->mlx, s->win, s->cube, s->x, s->y);
+#ifndef __EMSCRIPTEN__
 	usleep(8000);
+#endif
 	return (0);
 }
 

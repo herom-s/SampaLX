@@ -28,7 +28,9 @@ int	mlx_hook(void *win_ptr, int x_event, int x_mask, void *funct, void *param)
 	win->hooks[x_event].param = param;
 	win->hooks[x_event].mask = x_mask;
 	glfwSetWindowUserPointer(win->glfw_window, win);
+#ifndef __EMSCRIPTEN__
 	if (x_event == MLX_KEY_PRESS)
 		glfwSetInputMode(win->glfw_window, GLFW_STICKY_KEYS, GL_TRUE);
+#endif
 	return (0);
 }

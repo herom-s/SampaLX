@@ -14,14 +14,27 @@
 
 int	mlx_get_screen_size(void *mlx_ptr, int *sizex, int *sizey)
 {
-	GLFWmonitor					*monitor = glfwGetPrimaryMonitor();
-	const GLFWvidmode *const	vidmode = glfwGetVideoMode(monitor);
+	int	width;
+	int	height;
 
 	if (!mlx_ptr)
 		return (1);
+#ifdef __EMSCRIPTEN__
+	emscripten_get_screen_size(&width, &height);
+#else
+	{
+		const GLFWvidmode *const	vidmode =
+			glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+		if (!vidmode)
+			return (1);
+		width = vidmode->width;
+		height = vidmode->height;
+	}
+#endif
 	if (sizex)
-		*sizex = vidmode->width;
+		*sizex = width;
 	if (sizey)
-		*sizey = vidmode->height;
+		*sizey = height;
 	return (0);
 }
