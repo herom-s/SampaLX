@@ -50,4 +50,29 @@ fclean: clean
 
 re: fclean $(NAME)
 
-.PHONY: re clean fclean all
+.PHONY: re clean fclean all web webclean
+
+# --- WebGL / Emscripten build ---
+
+WEB_NAME = libmlx_web.a
+
+WEB_CC = emcc
+
+WEB_AR = emar
+
+WEB_CFLAGS = -Wall -Wextra -Werror -O3
+
+WEB_SRCS = $(SRCS)
+
+WEB_OBJS = $(WEB_SRCS:.c=.web.o)
+
+web: $(WEB_NAME)
+
+$(WEB_NAME): $(WEB_OBJS)
+	$(WEB_AR) rcs $(WEB_NAME) $(WEB_OBJS)
+
+%.web.o: %.c
+	$(WEB_CC) $(WEB_CFLAGS) -c $< -o $@
+
+webclean:
+	rm -rf $(WEB_OBJS) $(WEB_NAME)

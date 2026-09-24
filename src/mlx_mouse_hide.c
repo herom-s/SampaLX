@@ -13,14 +13,26 @@
 #include "../includes/mlx_int.h"
 #include <GLFW/glfw3.h>
 
+#ifdef __EMSCRIPTEN__
+EM_JS(void, _mlx_web_set_cursor, (int hidden), {
+	var canvas = document.querySelector('canvas');
+	if (canvas)
+		canvas.style.cursor = hidden ? 'none' : 'default';
+});
+#endif
+
 int	mlx_mouse_hide(void *mlx_ptr, void *win_ptr)
 {
 	t_window	*win;
 
 	(void)mlx_ptr;
 	win = (t_window *)win_ptr;
-	if (!win && !win->glfw_window)
+	if (!win || !win->glfw_window)
 		return (1);
-	glfwSetInputMode(win->glfw_window, GLFW_CURSOR,GLFW_CURSOR_HIDDEN);
+#ifdef __EMSCRIPTEN__
+	_mlx_web_set_cursor(1);
+#else
+	glfwSetInputMode(win->glfw_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+#endif
 	return (0);
 }

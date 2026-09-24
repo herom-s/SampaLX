@@ -13,7 +13,6 @@
 #include "../includes/mlx_int.h"
 #include <GLFW/glfw3.h>
 #include <stdint.h>
-#include <sys/times.h>
 
 // Little Endian on linux fix, pushing the pixels to where they belong
 static void	_mlx_modify_bits(uint8_t *pixel_start, uint32_t color, t_img *img)
@@ -96,7 +95,9 @@ int	mlx_put_image_to_window(void *mlx_ptr, void *win_ptr, void *img_ptr,
 	(void)mlx_ptr;
 	if (!window || !img)
 		return (1);
+#ifndef __EMSCRIPTEN__
 	glfwSwapInterval(0);
+#endif
 	_mlx_modify_bits_in_img(img);
 	glfwMakeContextCurrent(window->glfw_window);
 	glUseProgram(window->shader_program);

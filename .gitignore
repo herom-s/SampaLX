@@ -1,5 +1,8 @@
 *.o
 *.a
 test/program
+test/program.html
+test/program.js
+test/program.wasm
 a.out
 compile_flags.txt

@@ -12,7 +12,13 @@
 
 #include "../includes/mlx_int.h"
 
-static const char	*g_vertext_shader_src = "#version 330 core\n"
+#ifdef __EMSCRIPTEN__
+# define MLX_GLSL_HEADER "#version 300 es\n" "precision highp float;\n"
+#else
+# define MLX_GLSL_HEADER "#version 330 core\n"
+#endif
+
+static const char	*g_vertext_shader_src = MLX_GLSL_HEADER
 	"layout(location=0) in vec2 aPos;\n"
 	"layout(location=1) in vec2 aTex;\n"
 	"out vec2 TexCoord;\n"
@@ -29,7 +35,7 @@ static const char	*g_vertext_shader_src = "#version 330 core\n"
 	"   gl_Position = vec4(clipPos, 0.0, 1.0);\n"
 	"}";
 
-static const char	*g_fragment_shader_src = "#version 330 core\n"
+static const char	*g_fragment_shader_src = MLX_GLSL_HEADER
 	"in vec2 TexCoord;\n"
 	"out vec4 FragColor;\n"
 	"uniform sampler2D uTexture;\n"
@@ -37,7 +43,7 @@ static const char	*g_fragment_shader_src = "#version 330 core\n"
 	"    FragColor = texture(uTexture, TexCoord);\n"
 	"}";
 
-static const char	*g_text_vertex_shader_src = "#version 330 core\n"
+static const char	*g_text_vertex_shader_src = MLX_GLSL_HEADER
 	"layout(location=0) in vec2 aPos;\n"
 	"layout(location=1) in vec2 aTex;\n"
 	"out vec2 TexCoord;\n"
@@ -51,7 +57,7 @@ static const char	*g_text_vertex_shader_src = "#version 330 core\n"
 	"   gl_Position = vec4(clipPos, 0.0, 1.0);\n"
 	"}";
 
-static const char	*g_text_fragment_shader_src = "#version 330 core\n"
+static const char	*g_text_fragment_shader_src = MLX_GLSL_HEADER
 	"in vec2 TexCoord;\n"
 	"out vec4 FragColor;\n"
 	"uniform sampler2D uAtlas;\n"
